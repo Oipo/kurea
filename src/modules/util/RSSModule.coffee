@@ -15,8 +15,12 @@ module.exports = (Module) ->
 
 		feeds: {}
 
+		MAX_CACHED_URLS: 100
+
 		constructor: (moduleManager) ->
 			super moduleManager
+
+			@db = @newDatabase 'feed-cache'
 
 			generateKey = (origin, key) =>
 				origin.bot.config.server + origin.channel + key
@@ -26,18 +30,24 @@ module.exports = (Module) ->
 					@reply origin, "You need to specify a valid URL."
 					return
 
+				#check for title existence
+
 				newFeed = new FeedSub url,
 					interval: interval
-
-				newFeed.on "item", (item) =>
-						shorturl item.link, (shorturl) =>
-						@reply origin, "[#{color.bold title}] (#{shorturl}) #{item.title}"
+					history: 10
 
 				@feeds[generateKey origin,title] = newFeed
 
+				#load _cache from the database
+
 				newFeed.start()
 
-				@reply origin, "I am now watching #{title} (#{url}) for posts."
+				newFeed.on "item", (item) =>
+					#check if URL cached (up to 100 items), ignore if so - otherwise cache (both in DB and on feed._cache)
+					shorturl item.link, (shorturl) =>
+						@reply origin, "[#{color.bold title}] (#{shorturl}) #{item.title}"
+
+				@reply origin, "I am now watching #{color.bold title} (#{url}) for posts."
 
 			@addRoute "rss :title :interval *", (origin, route) =>
 				interval = parseInt route.params.interval
@@ -49,5 +59,7 @@ module.exports = (Module) ->
 
 			@addRoute "rss :title *", (origin, route) =>
 				rss origin, route.splats[0], route.params.title
+
+			#remove RSS by title
 
 	RSSModule
