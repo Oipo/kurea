@@ -16,8 +16,7 @@ class PermissionManager
 				callback err
 				return
 
-			console.log "Permission set is:", permissionSet, permissionString
-			console.log @matchSet(permissionSet, permissionString)
+			console.log "Permission set is:", permissionSet
 			callback null, @matchSet(permissionSet, permissionString)
 
 	matchSet: (permissionSet, permissionToMatch) ->
