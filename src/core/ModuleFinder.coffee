@@ -86,7 +86,7 @@ exports.loadCoreModules = (moduleManager) ->
 
 	file.walkSync coreModulesPath, (start, dirs, files) ->
 		for f in (files.map (f) -> start+path.sep+f)
-			if config.ignoredModules? and (path.basename f, '.coffee') in config.ignoredModules or not (endsWithModle(f))
+			if config.ignoredModules? and (path.basename f, '.coffee') in config.ignoredModules or not (endsWithModule(f))
 				console.log "--- IGNORING [CORE] #{path.basename f, '.coffee'}"
 				continue
 
