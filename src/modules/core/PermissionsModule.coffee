@@ -25,42 +25,50 @@ module.exports = (Module) ->
 			@permMan = @getBotManager().permissionManager
 	
 			@addRoute "permissions add :target :permission", "core.permission.modify.single", (origin, route) =>
+				console.log "permissions add"
+				console.log route
 				[target, permission] = [route.params.target.toLowerCase(), route.params.permission]
-	
+
 				@permMan.addPermission target, permission, (err) =>
 					if err?
 						@reply origin, "Uh oh, problem while adding permission! #{err}"
 						console.error err.stack
-	
+
 					else
 						@reply origin, "Added permission '#{permission}' to #{target}!"
 
 			@addRoute "permissions add-group :target :group", "core.permission.modify.group", (origin, route) =>
+				console.log "permissions add-group"
+				console.log route
 				[target, group] = [route.params.target.toLowerCase(), route.params.group]
-	
+
 				@permMan.addGroup origin.bot, target, group, (err) =>
 					if err?
 						@reply origin, "Uh oh, problem while adding group! #{err}"
 						console.error err.stack
-	
+
 					else
 						@reply origin, "Added #{target} to group '#{group}'!"
 
 
 			getGroups = (origin, route) =>
+				console.log "permissions getGroups"
+				console.log route
 				origin.user = route.params.user || origin.user
 				bot = origin.bot
 				bot.userManager.getUsername origin, (err, username) =>
 					@permMan.getGroups bot, username, (err, groups) =>
 						if groups.length > 0
 							@reply origin, "#{origin.user}'s groups are #{_.str.toSentence (colors.bold(group) for group in groups)}."
-							
+
 						else @reply origin, "#{origin.user} is not in any group."
 
 			@addRoute "permissions info", getGroups
 			@addRoute "permissions info :user", getGroups
-	
+
 			checkPermission = (origin, route) =>
+				console.log "permissions checkPermission"
+				console.log route
 				permission = route.params.permission
 				user = route.params.user ? origin.user
 	
